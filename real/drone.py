@@ -5,6 +5,14 @@ class Drone:
         self.id = id
         self.position = starting_pos
         self.max_load = max_load
+        self.products = ProductMap()
+        self.commands = []  # (Command Letter, Time, )
 
-    def distance_to(row, column):
-        return sqrt(((self.position.row - row) ** 2) + ((self.position.column - column) ** 2))
+    def distance_to(destination):
+        return self.position.distance(destination)
+
+    def available_in():
+        pass
+
+    def load(warehouse, product_type, amount):
+       pass
