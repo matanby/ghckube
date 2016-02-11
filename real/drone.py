@@ -1,3 +1,4 @@
+from copy import deepcopy
 from real import globals
 
 FAILURE = -1
@@ -44,11 +45,18 @@ class Drone:
         original_location = self.location
         distance = self.distance_to(warehouse.location)
         self.location = warehouse.location
+        # Fake load
+        original_products = deepcopy(self.products)
+        if product_id not in self.products:
+            self.products[product_id] = 0
+        self.products[product_id] += amount
         total_delivery_time = self.try_deliver_all()
         if self.turns_left < distance + total_delivery_time:
             self.location = original_location
+            self.products = original_products
             return FAILURE
         self.location = original_location
+        self.products = original_products
         return self.try_deliver_all()
 
     def load(self, warehouse_id, product_id, amount):
