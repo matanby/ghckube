@@ -70,8 +70,6 @@ class Drone:
         # Update location
         distance = self.distance_to(warehouse.location)
         self.location = warehouse.location
-        if product_id in self.products:
-            self.products[product_id] += amount
         # Update time
         self.turns_left -= (distance + 1)
         # Print command
