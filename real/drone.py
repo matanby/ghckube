@@ -5,16 +5,14 @@ FAILURE = -1
 class Drone:
     def __init__(self, did, starting_pos, max_load):
         self.did = did
-        self.position = starting_pos
+        self.location = starting_pos
         self.max_load = max_load
         self.products = {}
         self.customer_location = None
+        self.turns_left = turns
 
     def distance_to(self, destination):
-        return self.position.distance(destination)
-
-    def total_turns(self):
-        pass
+        return self.location.distance(destination)
 
     def current_load(self):
         return sum((products[product].weight * self.products[product] \
@@ -44,19 +42,30 @@ class Drone:
         distance = self.distance_to(self.warehouse.location)
         self.location = self.warehouse.location
         total_delivery_time = self.try_deliver_all()
-        if (turns_left < distance + 1):
+        if (self.turns_left < distance + 1):
             self.location = original_location
-            return False
+            return FAILURE
+        self.location = original_location
         return self.try_deliver_all()
 
-    def load(self, warehouse, product, amount):
-        # Print command
+    def load(self, warehouse_id, product_id, amount):
+        warehouse = warehouses[warehouse_id]
         # Update warehouse
+        warehouse.products_map[product_id] -= amount
+        # Update drone load
+        if product_id not in self.products:
+            self.products[product_id] = 0
+        self.products[product_id] += amount
         # Update location
+        distance = self.distance_to(warehouse.location)
+        self.location = warehouse.location
         if product.id in self.products:
             self.products[product.id] += amount
-        cmd = "{0} L {1} {2} {3}".format(self.id, warehouse.id, product.id, amount)
-        self.commands.append(cmd)
+        # Update time
+        self.turns_left -= (distance + 1)
+        # Print command
+        cmd = "{0} L {1} {2} {3}".format(self.did, warehouse_id, product_id, amount)
+        print cmd
         return cmd
 
     def try_deliver(self, customer_location, product_id, amount = None):
@@ -71,15 +80,40 @@ class Drone:
             return FAILURE
         # Do we have enough time to deliver?
         distance = self.distance_to(self.customer_location)
-        if (turns_left < distance + 1):
+        if (self.turns_left < distance + 1):
             return FAILURE
-        return True
+        return distance + 1
+
+    def deliver(self, customer_location, product_id, amount = None):
+        # Update inventory
+        if amount is None:
+            amount = self.products[product_id]
+        self.products[product_id] -= amount
+        # Update time
+        distance = self.distance_to(customer_location)
+        self.turns_left -= (distance + 1)
+        # Update location
+        self.location = customer_location
+        # Print command
+        cmd = "{0} D {1} {2} {3}".format(self.did, self.customer_id, self.product_id, amount)
+        print(cmd)
+        return cmd
 
     def try_deliver_all(self):
-        pass
-
-    def deliver(self):
-        pass
+        original_location = self.location
+        total_time = 0
+        for product_id in self.products:
+            product_amount = self.products[product_id]
+            deliver_time = self.try_deliver(self.customer_location, product_id, product_amount)
+            if deliver_time < 0:
+                self.location = original_location
+                return FAILURE
+            self.location = self.customer_location
+            total_time += deliver_time
+        self.location = original_location
+        return total_time
 
     def deliver_all(self):
-        pass
+        for product_id in self.products:
+            product_amount = self.products[product_id]
+            self.deliver(self.customer_location, product_id, product_amount)
