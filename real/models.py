@@ -10,7 +10,7 @@ class Location(object):
         if from_ is None:
             from_ = self
 
-        return int(math.sqrt(((to.row - from_.row) ** 2) + ((to.column - from_.column) ** 2)))
+        return int(math.ceil(math.sqrt(((to.row - from_.row) ** 2) + ((to.column - from_.column) ** 2))))
 
 
 class Order(object):
