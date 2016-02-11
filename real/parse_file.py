@@ -1,4 +1,5 @@
 import sys
+from real.drone import Drone
 from real.models import Product, Warehouse, Location, Order
 import real.globals
 
@@ -7,11 +8,11 @@ def load_data(path):
         content = input_file.readlines()
         
         first_row = content[0].split(" ")
-        row = int(first_row[0])
-        columns = int(first_row[1])
-        num_drones = int(first_row[2])
-        num_turns = int(first_row[3])
-        payload = int(first_row[4])
+        real.globals.map_rows = int(first_row[0])
+        real.globals.map_columns = int(first_row[1])
+        real.globals.drones_num = int(first_row[2])
+        real.globals.turns = int(first_row[3])
+        real.globals.payload = int(first_row[4])
 
         num_of_products = int(content[1])
         products_weights = content[2].split(" ")
@@ -55,5 +56,14 @@ def load_data(path):
 
             idx += 3
 
+
+def init_drones():
+    start_location = real.globals.warehouses[0].location
+    payload = real.globals.payload
+
+    for i in range(real.globals.drones_num):
+        real.globals.drones.append(Drone(i, start_location, payload))
+
 if __name__ == '__main__':
     load_data(sys.argv[1])
+    init_drones()
