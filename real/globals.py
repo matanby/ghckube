@@ -5,3 +5,5 @@ orders = []
 map_columns = -1
 map_rows = -1
 turns = -1
+drones_num = -1
+payload = -1
