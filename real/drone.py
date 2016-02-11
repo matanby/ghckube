@@ -1,6 +1,7 @@
-from models import Location
+from real import globals
 
 FAILURE = -1
+
 
 class Drone:
     def __init__(self, did, starting_pos, max_load):
@@ -10,16 +11,16 @@ class Drone:
         self.products = {}
         self.customer_id = None
         self.customer_location = None
-        self.turns_left = turns
+        self.turns_left = globals.turns
 
     def distance_to(self, destination):
         return self.location.distance(destination)
 
     def current_load(self):
-        return sum((products[product].weight * self.products[product] \
+        return sum((globals.products[product].weight * self.products[product] \
                 for product in self.products))
 
-    def set_customer(customer_location, customer_id):
+    def set_customer(self, customer_location, customer_id):
         self.customer_location = customer_location
         self.customer_id = customer_id
 
@@ -28,7 +29,7 @@ class Drone:
         or the total time until delivery"""
 
         # Is product in the given warehouse?
-        warehouse = warehouses[warehouse_id]
+        warehouse = globals.warehouses[warehouse_id]
         if product_id not in warehouse.products_map:
             return FAILURE
         # Do we have enough of this product?
@@ -36,22 +37,22 @@ class Drone:
         if product_left < amount:
             return FAILURE
         # Can we lift this product (x amount)?
-        product_weight = products[product_id].weight
-        if current_load + product_weight > self.max_load:
+        product_weight = globals.products[product_id].weight
+        if self.current_load() + product_weight > self.max_load:
             return FAILURE
         # Do we have enough time to load and deliver everything?
         original_location = self.location
-        distance = self.distance_to(self.warehouse.location)
-        self.location = self.warehouse.location
+        distance = self.distance_to(warehouse.location)
+        self.location = warehouse.location
         total_delivery_time = self.try_deliver_all()
-        if self.turns_left < total_delivery_time:
+        if self.turns_left < distance + total_delivery_time:
             self.location = original_location
             return FAILURE
         self.location = original_location
         return self.try_deliver_all()
 
     def load(self, warehouse_id, product_id, amount):
-        warehouse = warehouses[warehouse_id]
+        warehouse = globals.warehouses[warehouse_id]
         # Update warehouse
         warehouse.products_map[product_id] -= amount
         # Update drone load
@@ -61,8 +62,8 @@ class Drone:
         # Update location
         distance = self.distance_to(warehouse.location)
         self.location = warehouse.location
-        if product.id in self.products:
-            self.products[product.id] += amount
+        if product_id in self.products:
+            self.products[product_id] += amount
         # Update time
         self.turns_left -= (distance + 1)
         # Print command
@@ -82,7 +83,7 @@ class Drone:
             return FAILURE
         # Do we have enough time to deliver?
         distance = self.distance_to(self.customer_location)
-        if (self.turns_left < distance + 1):
+        if self.turns_left < distance + 1:
             return FAILURE
         return distance + 1
 
@@ -97,7 +98,7 @@ class Drone:
         # Update location
         self.location = customer_location
         # Print command
-        cmd = "{0} D {1} {2} {3}".format(self.did, self.customer_id, self.product_id, amount)
+        cmd = "{0} D {1} {2} {3}".format(self.did, self.customer_id, product_id, amount)
         print(cmd)
         return cmd
 

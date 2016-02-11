@@ -18,7 +18,7 @@ def load_data(path):
         products_weights = content[2].split(" ")
 
         for i in range(num_of_products):
-            real.globals.products.append(Product(i, products_weights[i]))
+            real.globals.products.append(Product(i, int(products_weights[i])))
 
         num_of_warehouses = int(content[3])
         

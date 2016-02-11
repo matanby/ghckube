@@ -32,5 +32,5 @@ class Warehouse(object):
         self.location = location
 
     def contains_product(self, pid):
-        return pid in self.products_map
+        return pid in self.products_map and self.products_map[pid] > 0
 

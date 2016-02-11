@@ -15,7 +15,7 @@ def run(orders):
                     # stop everything
                     return
 
-                globals.drones[did].set_customer(customer_location)
+                globals.drones[did].set_customer(customer_location, oid)
                 globals.drones[did].load(pid, wid, 1)
                 used_drones |= did
 
