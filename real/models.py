@@ -17,6 +17,8 @@ class Product(object):
 
 
 class Warehouse(object):
-    def __init__(self, wid, products_map):
+    def __init__(self, wid, products_map, location):
         self.wid = wid
         self.products_map = products_map
+        self.location = location
+
