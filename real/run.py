@@ -1,6 +1,7 @@
 import itertools
 
-import globals
+from real import globals
+from real import parse_file
 
 
 def run(orders):
@@ -38,6 +39,11 @@ def find_best_drone(pid):
 
 
 if __name__ == '__main__':
+    import sys
+    parse_file.load_data(sys.argv[1])
+    parse_file.init_drones()
+
     order_permutations = itertools.permutations(range(len(globals.orders)))
     for orders in order_permutations:
         run(orders)
+        break

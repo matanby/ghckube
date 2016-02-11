@@ -1,7 +1,7 @@
-import sys
 from real.drone import Drone
 from real.models import Product, Warehouse, Location, Order
 import real.globals
+
 
 def load_data(path):
     with open(path, 'r') as input_file:
@@ -45,11 +45,12 @@ def load_data(path):
             products = content[idx + 2].split(" ")
             products_map = {}
 
-            #init map
-            for j in range(num_of_products):
-                products_map[j] = 0
+            # init map
+            # for j in range(num_of_products):
+            #     products_map[j] = 0
 
             for k in range(len(products)):
+                products_map.setdefault(int(products[k]), 0)
                 products_map[int(products[k])] += 1
 
             real.globals.orders.append(Order(Location(int(location[0]), int(location[1])), products_map))
@@ -64,6 +65,3 @@ def init_drones():
     for i in range(real.globals.drones_num):
         real.globals.drones.append(Drone(i, start_location, payload))
 
-if __name__ == '__main__':
-    load_data(sys.argv[1])
-    init_drones()
