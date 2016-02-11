@@ -8,6 +8,7 @@ class Drone:
         self.location = starting_pos
         self.max_load = max_load
         self.products = {}
+        self.customer_id = None
         self.customer_location = None
         self.turns_left = turns
 
@@ -18,8 +19,9 @@ class Drone:
         return sum((products[product].weight * self.products[product] \
                 for product in self.products))
 
-    def set_customer(customer_location):
+    def set_customer(customer_location, customer_id):
         self.customer_location = customer_location
+        self.customer_id = customer_id
 
     def try_load(self, warehouse_id, product_id, amount):
         """Returns FAILURE (-1) if there's any problem (including final delivery)
@@ -42,7 +44,7 @@ class Drone:
         distance = self.distance_to(self.warehouse.location)
         self.location = self.warehouse.location
         total_delivery_time = self.try_deliver_all()
-        if (self.turns_left < distance + 1):
+        if self.turns_left < total_delivery_time:
             self.location = original_location
             return FAILURE
         self.location = original_location
